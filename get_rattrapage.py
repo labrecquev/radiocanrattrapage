@@ -16,6 +16,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 from pathlib import Path
+import ast
 
 now = datetime.now()
 now_str = now.strftime("%Y%m%d")
@@ -35,14 +36,16 @@ radio_shows = {"Les années lumière":"https://ici.radio-canada.ca/ohdio/premier
 def main():
     start = datetime.now()
     print(f"Script start, retrieving today's shows. It is {datetime.now()}")
-    # Load .env file
-    load_dotenv(override=True)
-    # get credentials
+    
+    load_dotenv(override=True) # Load .env file
+    
+    # get credentials and email info
     pwd = os.getenv('MY_PASSWORD')
     temp_dir = Path(os.getenv('TEMP_DIR'))
     mail_user = os.getenv('MAIL_USER')
     mail_list = os.getenv('MAIL_LIST')
-
+    
+    # main functions
     rattrapage_data = get_rattrapage_data(temp_dir)
     send_email_summary(rattrapage_data, mail_user, mail_list, pwd)
     
@@ -129,7 +132,7 @@ def send_email_summary(rattrapage_data, mail_user, mail_list, pwd):
     
     # Email parameters
     sent_from = mail_user
-    sent_to = mail_list    
+    sent_to = ', '.join(ast.literal_eval(mail_list))
     subject = f"Rattrapage Radio-Canada du {now.date()}"
     
     # Create the MIME message
